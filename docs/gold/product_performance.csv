@@ -1,0 +1,5 @@
+product_category,total_revenue,total_units_sold,avg_price,best_selling_product,revenue_share
+Books,425.48,3,141.83,Python Cookbook,22.3
+Clothing,281.94,4,70.48,Nike Shoes,14.8
+Electronics,1088.5,4,272.12,iPhone 14,57.0
+Food,112.74,3,37.58,Organic Coffee,5.9

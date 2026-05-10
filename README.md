@@ -1,0 +1,436 @@
+# Data Engineer Conversational Assistant
+
+A comprehensive Streamlit-based application that combines conversational AI with complete data pipeline monitoring and management capabilities.
+
+## 🎯 What This Application Does
+
+This application provides a complete data engineering assistant with:
+
+- **Conversational AI** - Ask questions in plain English about your data pipeline
+- **Pipeline Operations** - Execute and monitor Bronze-Silver-Gold data transformations
+- **Data Catalogue** - Explore tables, lineage, and PII-tagged data
+- **Quality Monitoring** - Automated quality checks and health assessments
+- **Real-time Dashboard** - Visual monitoring of all system metrics
+
+## 🏗️ Architecture Overview
+
+### Core Components
+- **Streamlit UI** - Multi-tab interface for all functionality
+- **AI Assistant** - GPT-4o-mini powered Q&A system with RAG
+- **Data Pipeline** - Bronze → Silver → Gold medallion architecture
+- **Catalogue Explorer** - Dynamic data discovery and metadata management
+- **Quality Agent** - Automated data validation and monitoring
+- **Metrics Server** - Prometheus-compatible monitoring
+
+### Data Flow
+```
+Raw Data → Bronze Layer → Silver Layer → Gold Layer → Analytics
+     ↓          ↓            ↓            ↓            ↓
+  Ingest    Validate     Clean     Aggregate    Consume
+```
+
+## 🛠️ Tech Stack
+
+### Core Components
+- **Frontend:** Streamlit with custom CSS styling
+- **AI/ML:** OpenAI GPT-4o-mini + SentenceTransformers embeddings
+- **Vector Search:** ChromaDB for document and code indexing
+- **Data Processing:** Pandas for ETL operations
+- **Monitoring:** Prometheus client for metrics collection
+- **Configuration:** Pydantic settings management
+- **Vector Search:** ChromaDB with SentenceTransformers embeddings
+- **Monitoring:** Prometheus metrics + Grafana dashboards
+
+### Data Processing
+- **Pipeline:** Bronze-Silver-Gold medallion architecture
+- **Quality:** Automated data validation and quality scoring
+- **Catalogue:** Dynamic data discovery with lineage tracking
+- **PII Detection:** Automatic sensitive data tagging
+
+### Developer Experience
+- **Testing:** Comprehensive pytest coverage
+- **Tooling:** MCP server integration for extensibility
+- **Documentation:** Auto-generated API docs and detailed guides
+
+## 📁 Project Structure
+
+```
+├── app/                          # Main application code
+│   ├── agents/                   # Agentic actions (quality checks, triggers)
+│   ├── catalogue/               # Data catalogue exploration
+│   │   └── explorer.py          # Catalogue scanning and metadata
+│   ├── config.py                # Application configuration
+│   ├── models.py                # Data models and schemas
+│   ├── observability/           # Monitoring and metrics
+│   │   └── metrics.py           # Prometheus metrics collection
+│   ├── pipeline/                # Data processing pipeline
+│   │   ├── processor.py         # Bronze-Silver-Gold transformations
+│   │   └── service.py           # Pipeline orchestration
+│   ├── rag/                     # Retrieval-Augmented Generation
+│   │   ├── ingestion.py         # Document indexing and chunking
+│   │   └── retriever.py         # Vector search and retrieval
+│   ├── services/                # Business logic services
+│   │   └── chat_service.py      # Chat orchestration and LLM integration
+│   └── ui/                      # User interfaces
+│       └── streamlit_app.py     # Main Streamlit application
+├── data/
+│   └── docs/                    # Data documentation and samples
+│       ├── bronze/              # Raw data layer
+│       ├── silver/              # Processed data layer
+│       └── gold/                # Aggregated insights layer
+├── infra/                       # Infrastructure as code
+│   ├── grafana/                 # Dashboard definitions and provisioning
+│   │   └── dashboards/          # Grafana dashboard JSON files
+│   └── prometheus/              # Prometheus configuration
+├── mcp_servers/                 # Model Context Protocol servers
+├── notebooks/                   # Jupyter notebooks for exploration
+├── scripts/                     # Utility scripts
+│   └── generate_demo_data.py    # Demo data generation
+├── slides/                      # Presentation materials
+├── tests/                       # Unit and integration tests
+└── docs/                        # Additional documentation
+```
+
+## 🚀 Quickstart
+
+### Prerequisites
+
+- **Python 3.11+** with pip
+- **Docker & Docker Compose** (for monitoring stack)
+- **OpenAI API Key** (optional - uses mock responses if not provided)
+
+### Installation & Setup
+
+1. **Clone and setup environment:**
+
+```bash
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies
+pip install -e ".[dev]"
+```
+
+2. **Configure environment variables:**
+
+```bash
+# Copy example environment file
+cp .env.example .env
+
+# Edit .env to add your OpenAI API key (optional)
+# OPENAI_API_KEY=your-key-here
+```
+
+3. **Build the knowledge base:**
+
+```bash
+# Index documentation and code for Q&A
+python -m app.rag.ingestion
+```
+
+### Running the Application
+
+4. **Start monitoring infrastructure (optional):**
+
+```bash
+# Start Prometheus and Grafana
+docker-compose up -d
+
+# Access points:
+# - Grafana: http://localhost:3000 (admin/admin)
+# - Prometheus: http://localhost:9090
+```
+
+5. **Start the application:**
+
+```bash
+# Start the complete Streamlit application
+streamlit run app/ui/streamlit_app.py
+
+# Application will be available at: http://localhost:8501
+```
+
+# Access: http://localhost:8501
+```
+
+### Generate Data & Test Pipeline
+
+7. **Generate fresh demo data (optional):**
+
+```bash
+python scripts/generate_demo_data.py
+```
+
+8. **Execute data pipeline:**
+
+Use the "Pipeline Operations" tab in the Streamlit app to execute pipelines and check status.
+
+9. **Scan data catalogue:**
+
+Use the "Data Catalogue" tab in the Streamlit app to scan layers and explore tables.
+
+### Testing
+
+10. **Run test suite:**
+
+```bash
+pytest -v
+```
+
+```bash
+pytest -q
+```
+
+## 🎛️ Application Interface
+
+The Streamlit application provides a unified interface with 5 main tabs:
+
+### 💬 Chat Assistant Tab
+- **Conversational AI**: Ask questions in plain English about your data pipeline
+- **Response Styles**: Choose between Standard, Detailed, or Code Examples
+- **Quality Checks**: Option to run quality validation during conversations
+- **Chat History**: Persistent conversation history with clear/reset options
+
+### 🔄 Pipeline Operations Tab
+- **Execute Pipeline**: Run full pipeline or specific Bronze→Silver→Gold layers
+- **Pipeline Status**: Real-time health monitoring and metrics
+- **Data Quality**: Validate data quality for each layer
+- **Execution Tracking**: Monitor pipeline performance and timing
+
+### 📋 Data Catalogue Tab
+- **Catalogue Scanning**: Automatically discover and catalog all data tables
+- **Table Explorer**: Browse tables with metadata, row counts, and column info
+- **Search Functionality**: Find tables by name, column, or content
+- **PII Detection**: Identify tables containing sensitive data
+- **Layer Breakdown**: View tables organized by Bronze/Silver/Gold layers
+
+### 🔍 Quality Checks Tab
+- **Comprehensive Assessment**: Full quality checks across all data layers
+- **Targeted Actions**: Run specific quality validations (schemas, duplicates, profiling)
+- **Quality Status**: Real-time health monitoring and issue tracking
+- **Automated Triggers**: Schedule and monitor quality checks
+
+### 📊 Monitoring Dashboard Tab
+- **System Metrics**: Real-time application and pipeline metrics
+- **Health Indicators**: Visual status of all system components
+- **Activity Tracking**: Recent operations and system events
+- **Raw Metrics**: Detailed Prometheus-compatible metrics data
+
+## 📊 Grafana Dashboards (Optional)
+
+Start the monitoring stack with:
+```bash
+docker-compose up -d
+```
+
+### Dashboard Access
+- **Grafana URL**: http://localhost:3000
+- **Default Credentials**: `admin` / `admin`
+- **Dashboard**: "Data Pipeline Operations Dashboard"
+
+### Dashboard Panels Explained
+
+#### 🚀 Pipeline Health Status
+- **What it shows**: Real-time health of your data pipeline
+- **Green = Healthy**: Pipeline is running successfully
+- **Red = Unhealthy**: Pipeline has failures or issues
+- **Updates**: Automatically refreshes every 10 seconds
+
+#### 📊 Total Pipeline Executions
+- **What it shows**: Total number of pipeline runs since startup
+- **Purpose**: Track how often your pipeline processes data
+- **Includes**: All successful and failed executions
+
+#### ✅ Pipeline Success Rate
+- **What it shows**: Percentage of successful pipeline runs
+- **Formula**: (Successful runs / Total runs) × 100
+- **Target**: Should be close to 100% for healthy pipelines
+
+#### ⏱️ Pipeline Performance
+- **What it shows**: Execution time percentiles (P50, P95, P99)
+- **Purpose**: Monitor pipeline performance and identify bottlenecks
+- **P95**: 95% of executions complete within this time
+
+#### 🔄 Layer Transformations
+- **What it shows**: Breakdown of transformations by layer
+- **Tracks**: Bronze→Silver and Silver→Gold processing
+- **Purpose**: See which parts of your pipeline are most active
+
+#### 📋 Data Catalogue Summary
+- **Tables Count**: Total number of tables discovered
+- **PII Tables**: Tables containing sensitive data
+- **Lineage Relations**: Data flow connections between tables
+
+#### 📈 Execution Rate (per minute)
+- **What it shows**: How often the pipeline runs per minute
+- **Purpose**: Monitor pipeline frequency and automation
+
+#### 🔍 Data Quality Scores
+- **What it shows**: Quality scores for each data layer
+- **Scale**: 0-100 (higher is better)
+- **Purpose**: Ensure data quality standards are met
+
+#### 🚨 Recent Failures
+- **What it shows**: Pipeline failures in the last hour
+- **Purpose**: Quick identification of issues
+- **Action**: Click to investigate failure details
+
+#### 📅 Last Execution Timestamp
+- **What it shows**: When the pipeline last ran successfully
+- **Purpose**: Verify pipeline is running on schedule
+
+### Dashboard Features
+- **Auto-refresh**: Updates every 10 seconds
+- **Color coding**: Green for healthy, red for issues
+- **Emoji indicators**: Makes status clear at a glance
+- **Interactive**: Click panels for detailed views
+- **Historical data**: See trends over time
+
+## 🏆 Why These Tools? (Production-Ready Choices)
+
+### Core Technologies
+- **ChromaDB**: Lightweight, local-first vector database perfect for demos and MVPs. Easy to set up and manage compared to cloud vector stores.
+- **Streamlit**: Fastest way to build interactive UIs without frontend complexity. Perfect for data science and ML applications.
+- **FastAPI**: Modern, high-performance API framework with automatic OpenAPI docs. Production-ready with async support.
+- **OpenAI GPT-4o-mini**: Excellent reasoning capabilities with cost-effective pricing. Includes fallback to mock responses for local development.
+
+### Data Engineering Stack
+- **Bronze-Silver-Gold Architecture**: Industry-standard medallion pattern for data lakehouses. Provides clear data quality progression.
+- **Prometheus + Grafana**: Enterprise-grade monitoring stack used by major tech companies. Comprehensive metrics and beautiful visualizations.
+
+### Developer Experience
+- **Pytest**: Battle-tested testing framework with rich ecosystem
+- **MCP (Model Context Protocol)**: Standardized interface for tool integrations, making it easy to add new data sources
+- **Poetry/Pip**: Modern Python packaging with reproducible environments
+
+## 🏗️ Data Pipeline Architecture
+
+### Bronze Layer (Raw Data Ingestion)
+**Purpose**: Store raw data as-is from source systems
+- **Customer Data**: Raw customer records with all original fields
+- **Transaction Data**: Raw transaction logs and purchase history
+- **Product Data**: Raw product catalog and inventory data
+- **Characteristics**: Minimal transformation, preserves original schema
+
+### Silver Layer (Data Cleansing & Enrichment)
+**Purpose**: Clean, standardize, and enrich data for analysis
+- **Processed Customers**: Email domains, age groups, income segmentation
+- **Processed Transactions**: Temporal features (day of week, weekend flags)
+- **Enriched Products**: Price categories, stock status, performance metrics
+- **Characteristics**: Business logic applied, data quality improved
+
+### Gold Layer (Business Insights & Aggregations)
+**Purpose**: Ready-for-consumption business intelligence data
+- **Customer Segmentation**: Revenue metrics, segment performance
+- **Monthly Performance**: KPIs, success rates, trend analysis
+- **Product Performance**: Category-level analytics and insights
+- **Characteristics**: Aggregated, optimized for reporting and dashboards
+
+### Data Flow
+```
+Raw Sources → Bronze Layer → Silver Layer → Gold Layer → Analytics
+     ↓            ↓            ↓            ↓            ↓
+   Ingest      Validate     Enrich     Aggregate    Consume
+```
+
+## 📝 Usage Examples
+
+### Chat with Your Data Pipeline
+
+```bash
+# Ask about pipeline design
+"What does the silver layer processing do?"
+
+# Explore data catalogue
+"Show me all tables with customer data"
+
+# Check pipeline health
+"Is the pipeline running successfully?"
+
+# Trigger actions
+"Run a quality check on the gold layer"
+```
+
+### API Usage Examples
+
+```bash
+# Execute pipeline
+curl -X POST "http://localhost:8000/pipeline/execute"
+
+# Scan catalogue
+curl -X POST "http://localhost:8000/catalogue/scan"
+
+# Chat with pipeline
+curl -X POST "http://localhost:8000/chat" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "How does the customer segmentation work?"}'
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+- `OPENAI_API_KEY`: Your OpenAI API key (optional)
+- `LOG_LEVEL`: Logging verbosity (DEBUG, INFO, WARNING, ERROR)
+- `PROMETHEUS_PORT`: Metrics server port (default: 8001)
+
+### Data Sources
+- **Demo Data**: Pre-generated in `data/docs/` folders
+- **Custom Data**: Replace CSV files in `data/docs/bronze/`
+- **Documentation**: Add pipeline docs to `data/docs/` for RAG indexing
+
+## 🧪 Development & Testing
+
+### Running Tests
+```bash
+# All tests
+pytest
+
+# With coverage
+pytest --cov=app --cov-report=html
+
+# Specific test file
+pytest tests/test_chat_service.py -v
+```
+
+### Code Quality
+```bash
+# Format code
+black app/ tests/
+
+# Lint code
+flake8 app/ tests/
+
+# Type checking
+mypy app/
+```
+
+## 📚 Additional Resources
+
+- **API Documentation**: http://localhost:8000/docs (when running)
+- **Beginner's Guide**: See `BEGINNERS_GUIDE.md` for detailed walkthrough
+- **Architecture Slides**: Check `slides/deck.md` for presentation materials
+- **Demo Notebook**: `notebooks/demo_walkthrough.ipynb`
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Ensure all tests pass
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+## ⚠️ Important Notes
+
+- **OpenAI API Key**: Optional - uses mock responses for local development if not provided
+- **Demo Data**: Pre-generated sample data is included for immediate testing
+- **Pipeline Execution**: Generates metrics that populate the Grafana dashboard
+- **Data Catalogue**: Automatically discovers tables and builds lineage relationships
+- **PII Detection**: Automatically tags sensitive data fields for compliance
+- **Extensibility**: MCP servers allow easy integration with external data sources

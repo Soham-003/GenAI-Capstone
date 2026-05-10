@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: "DE Assistant Dashboards"
+    orgId: 1
+    folder: "DE Assistant"
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

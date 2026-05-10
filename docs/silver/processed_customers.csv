@@ -1,0 +1,11 @@
+customer_id,email_domain,full_name,age_group,country,income_tier,signup_month,signup_year
+1,email.com,John Doe,25-34,USA,Medium,1,2023
+2,email.com,Jane Smith,25-34,Canada,High,2,2023
+3,email.com,Mike Wilson,45+,UK,High,3,2023
+4,email.com,Sarah Jones,18-24,USA,Low,4,2023
+5,email.com,Alex Brown,25-34,Australia,Medium,5,2023
+6,email.com,Emma Davis,25-34,Germany,Medium,6,2023
+7,email.com,Chris Miller,35-44,France,High,7,2023
+8,email.com,Lisa Garcia,25-34,Spain,Medium,8,2023
+9,email.com,David Lee,35-44,Japan,Premium,9,2023
+10,email.com,Amy Chen,35-44,China,Medium,10,2023

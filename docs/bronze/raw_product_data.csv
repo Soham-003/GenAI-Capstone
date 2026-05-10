@@ -1,0 +1,11 @@
+product_id,product_name,category,price,supplier_id,stock_quantity,launch_date
+P001,iPhone 14,Electronics,999.99,S1,50,2022-09-16
+P002,Samsung TV,Electronics,1299.99,S2,25,2022-11-01
+P003,Nike Shoes,Clothing,89.99,S3,100,2023-01-15
+P004,Levi's Jeans,Clothing,59.99,S4,80,2023-02-20
+P005,Python Cookbook,Books,45.99,S5,200,2022-08-10
+P006,Data Science Handbook,Books,65.99,S5,150,2023-03-05
+P007,Organic Coffee,Food,12.99,S6,500,2023-01-01
+P008,Artisan Bread,Food,8.99,S6,300,2023-02-14
+P009,Yoga Mat,Electronics,29.99,S7,120,2023-04-10
+P010,Wireless Mouse,Electronics,24.99,S8,200,2023-05-22

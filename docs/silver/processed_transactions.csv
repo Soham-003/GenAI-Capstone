@@ -1,0 +1,16 @@
+transaction_id,customer_id,transaction_date,amount,product_category,payment_method,status,day_of_week,quarter,is_weekend
+1001,1,2023-11-01,125.5,Electronics,Credit Card,Completed,Wednesday,4,False
+1002,2,2023-11-02,45.99,Clothing,PayPal,Completed,Thursday,4,False
+1003,1,2023-11-03,89.99,Books,Debit Card,Completed,Friday,4,False
+1004,3,2023-11-04,250.0,Electronics,Credit Card,Completed,Saturday,4,True
+1005,4,2023-11-05,32.5,Food,Cash,Completed,Sunday,4,True
+1006,2,2023-11-06,156.75,Electronics,Credit Card,Failed,Monday,4,False
+1007,5,2023-11-07,78.25,Clothing,PayPal,Completed,Tuesday,4,False
+1008,6,2023-11-08,415.0,Electronics,Credit Card,Completed,Wednesday,4,False
+1009,7,2023-11-09,23.99,Food,Debit Card,Completed,Thursday,4,False
+1010,8,2023-11-10,189.5,Books,Credit Card,Completed,Friday,4,False
+1011,9,2023-11-11,67.8,Clothing,PayPal,Completed,Saturday,4,True
+1012,10,2023-11-12,298.0,Electronics,Credit Card,Completed,Sunday,4,True
+1013,1,2023-11-13,56.25,Food,Cash,Completed,Monday,4,False
+1014,3,2023-11-14,145.99,Books,Debit Card,Completed,Tuesday,4,False
+1015,5,2023-11-15,89.9,Clothing,PayPal,Completed,Wednesday,4,False

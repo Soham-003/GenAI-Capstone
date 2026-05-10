@@ -1,0 +1,5 @@
+segment,total_transactions,total_revenue,avg_transaction_value,income_tier,customer_count,revenue_per_customer
+Experienced_Professionals,1,298.0,298.0,Medium,1,298.0
+Low_Value_Customers,1,32.5,32.5,Low,1,32.5
+Medium_Value_Customers,5,533.77,83.94,High,4,133.44
+Young_Professionals,7,1044.39,194.79,Medium,4,261.1

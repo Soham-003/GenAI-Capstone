@@ -1,0 +1,474 @@
+{
+  "id": null,
+  "title": "Data Pipeline Operations Dashboard",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "tags": ["pipeline", "data", "monitoring"],
+  "panels": [
+    {
+      "type": "stat",
+      "title": "🚀 Pipeline Health Status",
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": 0 },
+              { "color": "green", "value": 1 }
+            ]
+          },
+          "mappings": [
+            { "options": { "0": { "text": "🔴 UNHEALTHY", "color": "red" } }, "type": "value" },
+            { "options": { "1": { "text": "🟢 HEALTHY", "color": "green" } }, "type": "value" }
+          ]
+        }
+      },
+      "targets": [
+        { "expr": "pipeline_health_status", "refId": "A" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "📊 Total Pipeline Executions",
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "vis": false }, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "never", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
+          "mappings": [],
+          "thresholds": { "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }] }
+        }
+      },
+      "targets": [
+        { "expr": "sum(pipeline_executions_total)", "refId": "A" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "⚡ Success Rate",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto",
+        "unit": "percent"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": 0 },
+              { "color": "yellow", "value": 80 },
+              { "color": "green", "value": 95 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        { 
+          "expr": "(sum(pipeline_executions_total) - sum(pipeline_failures_total)) / sum(pipeline_executions_total) * 100", 
+          "refId": "A" 
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "⏱️ Avg Execution Time",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 0 },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto",
+        "unit": "s"
+      },
+      "targets": [
+        { 
+          "expr": "pipeline_execution_time_seconds", 
+          "refId": "A",
+          "legendFormat": "{{layer}}"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "title": "📌 Pipeline & Catalogue Summary",
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 4 },
+      "options": {
+        "content": "**Raw CSV data is loaded from `docs/bronze`, `docs/silver`, and `docs/gold`.**\n\n- Pipeline health is reported by execution success and failure tracking.\n- Data catalogue coverage, PII tagging, and lineage are exported as Prometheus metrics.\n- Use the cards below to validate catalogue completeness and lineage details.",
+        "mode": "markdown"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "🗂️ Catalogue Tables",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 8 },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": 0 },
+              { "color": "green", "value": null }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "catalogue_tables_count",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "🔒 PII Tagged Tables",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 8 },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": 0 },
+              { "color": "green", "value": null }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "catalogue_pii_table_count",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "🔗 Lineage Relationships",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 8 },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": 0 },
+              { "color": "green", "value": null }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "catalogue_lineage_relations_count",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "📈 Pipeline Execution Trend",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "targets": [
+        { 
+          "expr": "rate(pipeline_executions_total[5m])", 
+          "refId": "A",
+          "legendFormat": "Executions/sec ({{layer}})"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "🎯 Execution Time Distribution",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "targets": [
+        { 
+          "expr": "histogram_quantile(0.50, sum(rate(pipeline_execution_time_seconds_bucket[5m])) by (le, layer))", 
+          "refId": "A",
+          "legendFormat": "P50 ({{layer}})"
+        },
+        { 
+          "expr": "histogram_quantile(0.95, sum(rate(pipeline_execution_time_seconds_bucket[5m])) by (le, layer))", 
+          "refId": "B",
+          "legendFormat": "P95 ({{layer}})"
+        },
+        { 
+          "expr": "histogram_quantile(0.99, sum(rate(pipeline_execution_time_seconds_bucket[5m])) by (le, layer))", 
+          "refId": "C",
+          "legendFormat": "P99 ({{layer}})"
+        }
+      ]
+    },
+    {
+      "type": "piechart",
+      "title": "🔄 Layer Transformations",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 24 },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "pieType": "pie",
+        "tooltip": { "mode": "single", "sort": "none" },
+        "legend": { "displayMode": "list", "placement": "right" }
+      },
+      "targets": [
+        { 
+          "expr": "sum by (transformation) (layer_transformations_total)", 
+          "refId": "A",
+          "legendFormat": "{{transformation}}"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "🔍 Quality Checks Performed",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 24 },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        { 
+          "expr": "sum by (layer) (quality_checks_total)", 
+          "refId": "A",
+          "legendFormat": "{{layer}}"
+        }
+      ]
+    },
+    {
+      "type": "bargauge",
+      "title": "📊 Data Quality Scores",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 24 },
+      "options": {
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": 0 },
+              { "color": "yellow", "value": 70 },
+              { "color": "green", "value": 90 }
+            ]
+          },
+          "unit": "percent",
+          "max": 100,
+          "min": 0
+        }
+      },
+      "targets": [
+        { 
+          "expr": "data_quality_score", 
+          "refId": "A",
+          "legendFormat": "{{layer}}"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "📋 Recent Pipeline Failures",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 32 },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{ "desc": true, "displayName": "Time" }]
+      },
+      "targets": [
+        { 
+          "expr": "increase(pipeline_failures_total[1h])", 
+          "refId": "A",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        { "id": "organize", "options": { "excludeByName": { "Time": false }, "indexByName": {}, "renameByName": {} } }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "🏃 Last Execution Time",
+      "gridPos": { "h": 4, "w": 12, "x": 0, "y": 40 },
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        { 
+          "expr": "pipeline_last_execution_timestamp", 
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeAsIso"
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "🔄 Failed Transformations",
+      "gridPos": { "h": 4, "w": 12, "x": 12, "y": 40 },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
+        },
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        { 
+          "expr": "sum(pipeline_failures_total)", 
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "layer",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": "label_values(pipeline_executions_total, layer)",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "refresh": 1
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "annotations": {
+    "list": []
+  }
+}

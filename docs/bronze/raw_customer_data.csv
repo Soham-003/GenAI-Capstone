@@ -1,0 +1,11 @@
+customer_id,email,first_name,last_name,phone,signup_date,age,country,income_level
+1,john.doe@email.com,John,Doe,555-1234,2023-01-15,28,USA,75000
+2,jane.smith@email.com,Jane,Smith,555-5678,2023-02-20,34,Canada,82000
+3,mike.wilson@email.com,Mike,Wilson,555-9012,2023-03-10,45,UK,95000
+4,sarah.jones@email.com,Sarah,Jones,555-3456,2023-04-05,22,USA,45000
+5,alex.brown@email.com,Alex,Brown,555-7890,2023-05-12,31,Australia,68000
+6,emma.davis@email.com,Emma,Davis,555-2345,2023-06-18,29,Germany,72000
+7,chris.miller@email.com,Chris,Miller,555-6789,2023-07-22,38,France,88000
+8,lisa.garcia@email.com,Lisa,Garcia,555-0123,2023-08-30,26,Spain,58000
+9,david.lee@email.com,David,Lee,555-4567,2023-09-14,42,Japan,105000
+10,amy.chen@email.com,Amy,Chen,555-8901,2023-10-25,35,China,76000

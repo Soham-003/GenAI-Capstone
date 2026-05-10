@@ -1,0 +1,757 @@
+{
+  "tables": {
+    "bronze.raw_product_data": {
+      "name": "raw_product_data",
+      "layer": "bronze",
+      "file_path": "docs/bronze/raw_product_data.csv",
+      "row_count": 10,
+      "column_count": 7,
+      "columns": [
+        "product_id",
+        "product_name",
+        "category",
+        "price",
+        "supplier_id",
+        "stock_quantity",
+        "launch_date"
+      ],
+      "data_types": {
+        "product_id": "str",
+        "product_name": "str",
+        "category": "str",
+        "price": "float64",
+        "supplier_id": "str",
+        "stock_quantity": "int64",
+        "launch_date": "str"
+      },
+      "null_counts": {
+        "product_id": 0,
+        "product_name": 0,
+        "category": 0,
+        "price": 0,
+        "supplier_id": 0,
+        "stock_quantity": 0,
+        "launch_date": 0
+      },
+      "file_size": 591,
+      "last_modified": "2026-05-09T12:52:46.814914",
+      "sample_data": [
+        {
+          "product_id": "P001",
+          "product_name": "iPhone 14",
+          "category": "Electronics",
+          "price": 999.99,
+          "supplier_id": "S1",
+          "stock_quantity": 50,
+          "launch_date": "2022-09-16"
+        },
+        {
+          "product_id": "P002",
+          "product_name": "Samsung TV",
+          "category": "Electronics",
+          "price": 1299.99,
+          "supplier_id": "S2",
+          "stock_quantity": 25,
+          "launch_date": "2022-11-01"
+        },
+        {
+          "product_id": "P003",
+          "product_name": "Nike Shoes",
+          "category": "Clothing",
+          "price": 89.99,
+          "supplier_id": "S3",
+          "stock_quantity": 100,
+          "launch_date": "2023-01-15"
+        }
+      ]
+    },
+    "bronze.raw_transaction_data": {
+      "name": "raw_transaction_data",
+      "layer": "bronze",
+      "file_path": "docs/bronze/raw_transaction_data.csv",
+      "row_count": 15,
+      "column_count": 7,
+      "columns": [
+        "transaction_id",
+        "customer_id",
+        "transaction_date",
+        "amount",
+        "product_category",
+        "payment_method",
+        "status"
+      ],
+      "data_types": {
+        "transaction_id": "int64",
+        "customer_id": "int64",
+        "transaction_date": "str",
+        "amount": "float64",
+        "product_category": "str",
+        "payment_method": "str",
+        "status": "str"
+      },
+      "null_counts": {
+        "transaction_id": 0,
+        "customer_id": 0,
+        "transaction_date": 0,
+        "amount": 0,
+        "product_category": 0,
+        "payment_method": 0,
+        "status": 0
+      },
+      "file_size": 877,
+      "last_modified": "2026-05-09T12:52:42.428329",
+      "sample_data": [
+        {
+          "transaction_id": 1001,
+          "customer_id": 1,
+          "transaction_date": "2023-11-01",
+          "amount": 125.5,
+          "product_category": "Electronics",
+          "payment_method": "Credit Card",
+          "status": "Completed"
+        },
+        {
+          "transaction_id": 1002,
+          "customer_id": 2,
+          "transaction_date": "2023-11-02",
+          "amount": 45.99,
+          "product_category": "Clothing",
+          "payment_method": "PayPal",
+          "status": "Completed"
+        },
+        {
+          "transaction_id": 1003,
+          "customer_id": 1,
+          "transaction_date": "2023-11-03",
+          "amount": 89.99,
+          "product_category": "Books",
+          "payment_method": "Debit Card",
+          "status": "Completed"
+        }
+      ]
+    },
+    "bronze.raw_customer_data": {
+      "name": "raw_customer_data",
+      "layer": "bronze",
+      "file_path": "docs/bronze/raw_customer_data.csv",
+      "row_count": 10,
+      "column_count": 9,
+      "columns": [
+        "customer_id",
+        "email",
+        "first_name",
+        "last_name",
+        "phone",
+        "signup_date",
+        "age",
+        "country",
+        "income_level"
+      ],
+      "data_types": {
+        "customer_id": "int64",
+        "email": "str",
+        "first_name": "str",
+        "last_name": "str",
+        "phone": "str",
+        "signup_date": "str",
+        "age": "int64",
+        "country": "str",
+        "income_level": "int64"
+      },
+      "null_counts": {
+        "customer_id": 0,
+        "email": 0,
+        "first_name": 0,
+        "last_name": 0,
+        "phone": 0,
+        "signup_date": 0,
+        "age": 0,
+        "country": 0,
+        "income_level": 0
+      },
+      "file_size": 775,
+      "last_modified": "2026-05-09T12:52:37.478914",
+      "sample_data": [
+        {
+          "customer_id": 1,
+          "email": "john.doe@email.com",
+          "first_name": "John",
+          "last_name": "Doe",
+          "phone": "555-1234",
+          "signup_date": "2023-01-15",
+          "age": 28,
+          "country": "USA",
+          "income_level": 75000
+        },
+        {
+          "customer_id": 2,
+          "email": "jane.smith@email.com",
+          "first_name": "Jane",
+          "last_name": "Smith",
+          "phone": "555-5678",
+          "signup_date": "2023-02-20",
+          "age": 34,
+          "country": "Canada",
+          "income_level": 82000
+        },
+        {
+          "customer_id": 3,
+          "email": "mike.wilson@email.com",
+          "first_name": "Mike",
+          "last_name": "Wilson",
+          "phone": "555-9012",
+          "signup_date": "2023-03-10",
+          "age": 45,
+          "country": "UK",
+          "income_level": 95000
+        }
+      ]
+    },
+    "silver.processed_customers": {
+      "name": "processed_customers",
+      "layer": "silver",
+      "file_path": "docs/silver/processed_customers.csv",
+      "row_count": 10,
+      "column_count": 8,
+      "columns": [
+        "customer_id",
+        "email_domain",
+        "full_name",
+        "age_group",
+        "country",
+        "income_tier",
+        "signup_month",
+        "signup_year"
+      ],
+      "data_types": {
+        "customer_id": "int64",
+        "email_domain": "str",
+        "full_name": "str",
+        "age_group": "str",
+        "country": "str",
+        "income_tier": "str",
+        "signup_month": "int64",
+        "signup_year": "int64"
+      },
+      "null_counts": {
+        "customer_id": 0,
+        "email_domain": 0,
+        "full_name": 0,
+        "age_group": 0,
+        "country": 0,
+        "income_tier": 0,
+        "signup_month": 0,
+        "signup_year": 0
+      },
+      "file_size": 573,
+      "last_modified": "2026-05-10T19:30:02.090485",
+      "sample_data": [
+        {
+          "customer_id": 1,
+          "email_domain": "email.com",
+          "full_name": "John Doe",
+          "age_group": "25-34",
+          "country": "USA",
+          "income_tier": "Medium",
+          "signup_month": 1,
+          "signup_year": 2023
+        },
+        {
+          "customer_id": 2,
+          "email_domain": "email.com",
+          "full_name": "Jane Smith",
+          "age_group": "25-34",
+          "country": "Canada",
+          "income_tier": "High",
+          "signup_month": 2,
+          "signup_year": 2023
+        },
+        {
+          "customer_id": 3,
+          "email_domain": "email.com",
+          "full_name": "Mike Wilson",
+          "age_group": "45+",
+          "country": "UK",
+          "income_tier": "High",
+          "signup_month": 3,
+          "signup_year": 2023
+        }
+      ]
+    },
+    "silver.enriched_products": {
+      "name": "enriched_products",
+      "layer": "silver",
+      "file_path": "docs/silver/enriched_products.csv",
+      "row_count": 10,
+      "column_count": 9,
+      "columns": [
+        "product_id",
+        "product_name",
+        "category",
+        "price",
+        "price_category",
+        "supplier_id",
+        "stock_status",
+        "launch_year",
+        "months_since_launch"
+      ],
+      "data_types": {
+        "product_id": "str",
+        "product_name": "str",
+        "category": "str",
+        "price": "float64",
+        "price_category": "str",
+        "supplier_id": "str",
+        "stock_status": "str",
+        "launch_year": "int64",
+        "months_since_launch": "int64"
+      },
+      "null_counts": {
+        "product_id": 0,
+        "product_name": 0,
+        "category": 0,
+        "price": 0,
+        "price_category": 0,
+        "supplier_id": 0,
+        "stock_status": 0,
+        "launch_year": 0,
+        "months_since_launch": 0
+      },
+      "file_size": 719,
+      "last_modified": "2026-05-10T19:30:02.091937",
+      "sample_data": [
+        {
+          "product_id": "P001",
+          "product_name": "iPhone 14",
+          "category": "Electronics",
+          "price": 999.99,
+          "price_category": "Premium",
+          "supplier_id": "S1",
+          "stock_status": "Low Stock",
+          "launch_year": 2022,
+          "months_since_launch": 44
+        },
+        {
+          "product_id": "P002",
+          "product_name": "Samsung TV",
+          "category": "Electronics",
+          "price": 1299.99,
+          "price_category": "Premium",
+          "supplier_id": "S2",
+          "stock_status": "Low Stock",
+          "launch_year": 2022,
+          "months_since_launch": 42
+        },
+        {
+          "product_id": "P003",
+          "product_name": "Nike Shoes",
+          "category": "Clothing",
+          "price": 89.99,
+          "price_category": "High",
+          "supplier_id": "S3",
+          "stock_status": "In Stock",
+          "launch_year": 2023,
+          "months_since_launch": 40
+        }
+      ]
+    },
+    "silver.processed_transactions": {
+      "name": "processed_transactions",
+      "layer": "silver",
+      "file_path": "docs/silver/processed_transactions.csv",
+      "row_count": 15,
+      "column_count": 10,
+      "columns": [
+        "transaction_id",
+        "customer_id",
+        "transaction_date",
+        "amount",
+        "product_category",
+        "payment_method",
+        "status",
+        "day_of_week",
+        "quarter",
+        "is_weekend"
+      ],
+      "data_types": {
+        "transaction_id": "int64",
+        "customer_id": "int64",
+        "transaction_date": "str",
+        "amount": "float64",
+        "product_category": "str",
+        "payment_method": "str",
+        "status": "str",
+        "day_of_week": "str",
+        "quarter": "int64",
+        "is_weekend": "bool"
+      },
+      "null_counts": {
+        "transaction_id": 0,
+        "customer_id": 0,
+        "transaction_date": 0,
+        "amount": 0,
+        "product_category": 0,
+        "payment_method": 0,
+        "status": 0,
+        "day_of_week": 0,
+        "quarter": 0,
+        "is_weekend": 0
+      },
+      "file_size": 1140,
+      "last_modified": "2026-05-10T19:30:02.091294",
+      "sample_data": [
+        {
+          "transaction_id": 1001,
+          "customer_id": 1,
+          "transaction_date": "2023-11-01",
+          "amount": 125.5,
+          "product_category": "Electronics",
+          "payment_method": "Credit Card",
+          "status": "Completed",
+          "day_of_week": "Wednesday",
+          "quarter": 4,
+          "is_weekend": false
+        },
+        {
+          "transaction_id": 1002,
+          "customer_id": 2,
+          "transaction_date": "2023-11-02",
+          "amount": 45.99,
+          "product_category": "Clothing",
+          "payment_method": "PayPal",
+          "status": "Completed",
+          "day_of_week": "Thursday",
+          "quarter": 4,
+          "is_weekend": false
+        },
+        {
+          "transaction_id": 1003,
+          "customer_id": 1,
+          "transaction_date": "2023-11-03",
+          "amount": 89.99,
+          "product_category": "Books",
+          "payment_method": "Debit Card",
+          "status": "Completed",
+          "day_of_week": "Friday",
+          "quarter": 4,
+          "is_weekend": false
+        }
+      ]
+    },
+    "gold.product_performance": {
+      "name": "product_performance",
+      "layer": "gold",
+      "file_path": "docs/gold/product_performance.csv",
+      "row_count": 4,
+      "column_count": 6,
+      "columns": [
+        "product_category",
+        "total_revenue",
+        "total_units_sold",
+        "avg_price",
+        "best_selling_product",
+        "revenue_share"
+      ],
+      "data_types": {
+        "product_category": "str",
+        "total_revenue": "float64",
+        "total_units_sold": "int64",
+        "avg_price": "float64",
+        "best_selling_product": "str",
+        "revenue_share": "float64"
+      },
+      "null_counts": {
+        "product_category": 0,
+        "total_revenue": 0,
+        "total_units_sold": 0,
+        "avg_price": 0,
+        "best_selling_product": 0,
+        "revenue_share": 0
+      },
+      "file_size": 258,
+      "last_modified": "2026-05-10T19:30:02.115521",
+      "sample_data": [
+        {
+          "product_category": "Books",
+          "total_revenue": 425.48,
+          "total_units_sold": 3,
+          "avg_price": 141.83,
+          "best_selling_product": "Python Cookbook",
+          "revenue_share": 22.3
+        },
+        {
+          "product_category": "Clothing",
+          "total_revenue": 281.94,
+          "total_units_sold": 4,
+          "avg_price": 70.48,
+          "best_selling_product": "Nike Shoes",
+          "revenue_share": 14.8
+        },
+        {
+          "product_category": "Electronics",
+          "total_revenue": 1088.5,
+          "total_units_sold": 4,
+          "avg_price": 272.12,
+          "best_selling_product": "iPhone 14",
+          "revenue_share": 57.0
+        }
+      ]
+    },
+    "gold.monthly_performance_metrics": {
+      "name": "monthly_performance_metrics",
+      "layer": "gold",
+      "file_path": "docs/gold/monthly_performance_metrics.csv",
+      "row_count": 1,
+      "column_count": 8,
+      "columns": [
+        "month",
+        "year",
+        "total_revenue",
+        "total_transactions",
+        "avg_transaction_value",
+        "unique_customers",
+        "success_rate",
+        "top_category"
+      ],
+      "data_types": {
+        "month": "int64",
+        "year": "int64",
+        "total_revenue": "float64",
+        "total_transactions": "int64",
+        "avg_transaction_value": "float64",
+        "unique_customers": "int64",
+        "success_rate": "float64",
+        "top_category": "str"
+      },
+      "null_counts": {
+        "month": 0,
+        "year": 0,
+        "total_revenue": 0,
+        "total_transactions": 0,
+        "avg_transaction_value": 0,
+        "unique_customers": 0,
+        "success_rate": 0,
+        "top_category": 0
+      },
+      "file_size": 156,
+      "last_modified": "2026-05-10T19:30:02.115030",
+      "sample_data": [
+        {
+          "month": 11,
+          "year": 2023,
+          "total_revenue": 1908.66,
+          "total_transactions": 14,
+          "avg_transaction_value": 136.33,
+          "unique_customers": 10,
+          "success_rate": 100.0,
+          "top_category": "Electronics"
+        }
+      ]
+    },
+    "gold.customer_segmentation": {
+      "name": "customer_segmentation",
+      "layer": "gold",
+      "file_path": "docs/gold/customer_segmentation.csv",
+      "row_count": 4,
+      "column_count": 7,
+      "columns": [
+        "segment",
+        "total_transactions",
+        "total_revenue",
+        "avg_transaction_value",
+        "income_tier",
+        "customer_count",
+        "revenue_per_customer"
+      ],
+      "data_types": {
+        "segment": "str",
+        "total_transactions": "int64",
+        "total_revenue": "float64",
+        "avg_transaction_value": "float64",
+        "income_tier": "str",
+        "customer_count": "int64",
+        "revenue_per_customer": "float64"
+      },
+      "null_counts": {
+        "segment": 0,
+        "total_transactions": 0,
+        "total_revenue": 0,
+        "avg_transaction_value": 0,
+        "income_tier": 0,
+        "customer_count": 0,
+        "revenue_per_customer": 0
+      },
+      "file_size": 313,
+      "last_modified": "2026-05-10T19:30:02.114652",
+      "sample_data": [
+        {
+          "segment": "Experienced_Professionals",
+          "total_transactions": 1,
+          "total_revenue": 298.0,
+          "avg_transaction_value": 298.0,
+          "income_tier": "Medium",
+          "customer_count": 1,
+          "revenue_per_customer": 298.0
+        },
+        {
+          "segment": "Low_Value_Customers",
+          "total_transactions": 1,
+          "total_revenue": 32.5,
+          "avg_transaction_value": 32.5,
+          "income_tier": "Low",
+          "customer_count": 1,
+          "revenue_per_customer": 32.5
+        },
+        {
+          "segment": "Medium_Value_Customers",
+          "total_transactions": 5,
+          "total_revenue": 533.77,
+          "avg_transaction_value": 83.94,
+          "income_tier": "High",
+          "customer_count": 4,
+          "revenue_per_customer": 133.44
+        }
+      ]
+    }
+  },
+  "lineage": {
+    "bronze_to_silver": {
+      "source_tables": [
+        "bronze.raw_product_data",
+        "bronze.raw_transaction_data",
+        "bronze.raw_customer_data"
+      ],
+      "target_tables": [
+        "silver.processed_customers",
+        "silver.enriched_products",
+        "silver.processed_transactions"
+      ],
+      "transformations": [
+        "Customer data enrichment (email domain, age groups, income tiers)",
+        "Transaction temporal analysis (day of week, quarter, weekend flag)",
+        "Product categorization (price categories, stock status)"
+      ]
+    },
+    "silver_to_gold": {
+      "source_tables": [
+        "silver.processed_customers",
+        "silver.enriched_products",
+        "silver.processed_transactions"
+      ],
+      "target_tables": [
+        "gold.product_performance",
+        "gold.monthly_performance_metrics",
+        "gold.customer_segmentation"
+      ],
+      "transformations": [
+        "Customer segmentation analysis",
+        "Monthly performance metrics aggregation",
+        "Product performance analytics"
+      ]
+    }
+  },
+  "pii_tags": {
+    "bronze.raw_product_data": {
+      "identifier": [
+        "product_id"
+      ]
+    },
+    "bronze.raw_transaction_data": {
+      "identifier": [
+        "customer_id",
+        "transaction_id"
+      ]
+    },
+    "bronze.raw_customer_data": {
+      "email": [
+        "email"
+      ],
+      "name": [
+        "first_name",
+        "last_name"
+      ],
+      "phone": [
+        "phone"
+      ],
+      "identifier": [
+        "customer_id"
+      ]
+    },
+    "silver.processed_customers": {
+      "name": [
+        "full_name"
+      ],
+      "identifier": [
+        "customer_id"
+      ]
+    },
+    "silver.enriched_products": {
+      "identifier": [
+        "product_id"
+      ]
+    },
+    "silver.processed_transactions": {
+      "identifier": [
+        "customer_id",
+        "transaction_id"
+      ]
+    }
+  },
+  "quality_metrics": {
+    "bronze.raw_product_data": {
+      "completeness": 100.0,
+      "uniqueness": 90.0,
+      "validity": 100.0,
+      "overall_score": 96.67
+    },
+    "bronze.raw_transaction_data": {
+      "completeness": 100.0,
+      "uniqueness": 83.33,
+      "validity": 100.0,
+      "overall_score": 94.44
+    },
+    "bronze.raw_customer_data": {
+      "completeness": 100.0,
+      "uniqueness": 100.0,
+      "validity": 100.0,
+      "overall_score": 100.0
+    },
+    "silver.processed_customers": {
+      "completeness": 100.0,
+      "uniqueness": 100.0,
+      "validity": 100.0,
+      "overall_score": 100.0
+    },
+    "silver.enriched_products": {
+      "completeness": 100.0,
+      "uniqueness": 90.0,
+      "validity": 100.0,
+      "overall_score": 96.67
+    },
+    "silver.processed_transactions": {
+      "completeness": 100.0,
+      "uniqueness": 83.33,
+      "validity": 100.0,
+      "overall_score": 94.44
+    },
+    "gold.product_performance": {
+      "completeness": 100.0,
+      "uniqueness": 100.0,
+      "validity": 100.0,
+      "overall_score": 100.0
+    },
+    "gold.monthly_performance_metrics": {
+      "completeness": 100.0,
+      "uniqueness": 100.0,
+      "validity": 100.0,
+      "overall_score": 100.0
+    },
+    "gold.customer_segmentation": {
+      "completeness": 100.0,
+      "uniqueness": 100.0,
+      "validity": 100.0,
+      "overall_score": 100.0
+    }
+  },
+  "last_updated": "2026-05-10T19:42:10.944738"
+}
