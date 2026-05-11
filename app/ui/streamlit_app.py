@@ -342,123 +342,154 @@ with tab2:
 # TAB 3: DATA CATALOGUE
 # ============================================================================
 with tab3:
-    st.header("📋 Data Catalogue")
-
-    col1, col2 = st.columns([1, 2])
-
+    st.markdown("# 📋 Data Catalogue")
+    
+    # Add some spacing
+    st.markdown("")
+    
+    # Main operations section with cards layout
+    st.markdown("### 🔍 Discover & Manage")
+    
+    col1, col2 = st.columns([1, 1])
+    
     with col1:
-        st.subheader("📋 Catalogue Operations")
-
-        # Scan section with better styling
-        col1, col2 = st.columns([2, 1])
-        
-        with col1:
-            if st.button("🔍 Scan Data Layers", type="primary", use_container_width=True):
-                with st.spinner("Scanning data layers..."):
-                    try:
-                        result = catalogue_explorer.scan_data_layers()
-                        st.success(f"✅ Catalogue updated! Found {result['tables_found']} tables")
+        # Scan button with better styling
+        if st.button("� Scan All Data Layers", type="primary", use_container_width=True):
+            with st.spinner("🔍 Scanning data layers..."):
+                try:
+                    result = catalogue_explorer.scan_data_layers()
+                    st.success(f"✅ Scan Complete! Found {result['tables_found']} tables")
+                    with st.expander("📊 Scan Results", expanded=True):
                         st.json(result)
-                    except Exception as e:
-                        st.error(f"❌ Scan failed: {str(e)}")
-        
-        with col2:
-            st.write("")  # Spacer for alignment
-
-        # List tables section
-        st.subheader("📊 Table Inventory")
-        
-        if st.button("📋 List All Tables", use_container_width=True):
-            try:
-                tables = catalogue_explorer.catalogue["tables"]
+                except Exception as e:
+                    st.error(f"❌ Scan failed: {str(e)}")
+    
+    with col2:
+        st.markdown("")  # Spacer
+    
+    # Quick stats section
+    st.markdown("### 📊 Quick Overview")
+    
+    try:
+        tables = catalogue_explorer.catalogue.get("tables", {})
+        if tables:
+            # Create metrics cards
+            col_a, col_b, col_c, col_d = st.columns(4)
+            
+            with col_a:
+                st.metric("📋 Total Tables", len(tables))
+            
+            with col_b:
+                bronze_count = len([t for t in tables.values() if t.get("layer") == "bronze"])
+                st.metric("🗂 Bronze", bronze_count)
+            
+            with col_c:
+                silver_count = len([t for t in tables.values() if t.get("layer") == "silver"])
+                st.metric("🗂 Silver", silver_count)
+            
+            with col_d:
+                gold_count = len([t for t in tables.values() if t.get("layer") == "gold"])
+                st.metric("� Gold", gold_count)
+            
+            # PII summary
+            pii_tables = len([t for t in tables.values() if t.get("pii_columns")])
+            st.markdown(f"🔒 **PII Tables**: {pii_tables} of {len(tables)}")
+    
+    except Exception as e:
+        st.error(f"❌ Failed to load catalogue: {str(e)}")
+    
+    # Table browser section
+    st.markdown("---")
+    st.markdown("### 📋 Browse Tables")
+    
+    # Layer tabs for better organization
+    layer_tab1, layer_tab2, layer_tab3 = st.tabs(["🗂 Bronze", "🗂 Silver", "🗂 Gold"])
+    
+    layer_tabs = [layer_tab1, layer_tab2, layer_tab3]
+    layer_names = ["bronze", "silver", "gold"]
+    
+    for i, layer_tab in enumerate(layer_tabs):
+        layer_name = layer_names[i]
+        with layer_tab:
+            layer_tables = {name: info for name, info in tables.items() 
+                          if info.get("layer", "").lower() == layer_name}
+            
+            if layer_tables:
+                st.markdown(f"#### � {layer_name.title()} Layer ({len(layer_tables)} tables)")
                 
-                if tables:
-                    # Create better styled table display
-                    st.success(f"📊 Found {len(tables)} tables across all layers")
-                    
-                    # Display with better formatting
-                    for layer in ["bronze", "silver", "gold"]:
-                        layer_tables = {name: info for name, info in tables.items() 
-                                      if info.get("layer", "").lower() == layer}
+                # Display tables in a grid
+                for table_name, table_info in layer_tables.items():
+                    with st.expander(f"📄 {table_name}", expanded=False):
+                        # Table header with metrics
+                        col1, col2, col3 = st.columns(3)
                         
-                        if layer_tables:
-                            st.write(f"### 🗂 {layer.title()} Layer ({len(layer_tables)} tables)")
-                            
-                            for table_name, table_info in layer_tables.items():
-                                with st.expander(f"📄 {table_name}"):
-                                    col_a, col_b, col_c = st.columns(3)
-                                    
-                                    with col_a:
-                                        st.metric("Rows", table_info.get("row_count", 0))
-                                    
-                                    with col_b:
-                                        st.metric("Columns", len(table_info.get("columns", [])))
-                                    
-                                    with col_c:
-                                        has_pii = bool(table_info.get("pii_columns", []))
-                                        st.metric("PII", "🔒 Yes" if has_pii else "✅ No")
-                                    
-                                    # Show schema
-                                    if table_info.get("columns"):
-                                        st.write("**Schema:**")
-                                        st.code(", ".join(table_info["columns"]))
-                else:
-                    st.info("📋 No tables found. Run a scan first to discover your data layers.")
-
-            except Exception as e:
-                st.error(f"❌ Failed to list tables: {str(e)}")
-
-        # Search section with better UI
-        st.subheader("� Search Tables")
-        
-        col_search, col_button = st.columns([3, 1])
-        
-        with col_search:
-            search_query = st.text_input("Search tables or columns...", placeholder="Enter table name or column...")
-        
-        with col_button:
-            st.write("")  # Spacer
-        
-        if st.button("🔎 Search", use_container_width=True) and search_query:
-            try:
-                results = catalogue_explorer.search_tables(search_query)
+                        with col1:
+                            st.metric("📏 Rows", table_info.get("row_count", 0))
+                        
+                        with col2:
+                            st.metric("📋 Columns", len(table_info.get("columns", [])))
+                        
+                        with col3:
+                            has_pii = bool(table_info.get("pii_columns", []))
+                            pii_icon = "🔒" if has_pii else "✅"
+                            st.metric(f"{pii_icon} PII", "Yes" if has_pii else "No")
+                        
+                        # Schema section
+                        if table_info.get("columns"):
+                            st.markdown("**📋 Schema:**")
+                            st.code(", ".join(table_info["columns"]), language="text")
+            else:
+                st.info(f"📋 No tables found in {layer_name} layer")
+    
+    # Search section at bottom
+    st.markdown("---")
+    st.markdown("### 🔍 Search Catalogue")
+    
+    col_search, col_search_btn = st.columns([3, 1])
+    
+    with col_search:
+        search_query = st.text_input("Search tables, columns, or data...", 
+                                 placeholder="Enter search terms...")
+    
+    with col_search_btn:
+        st.markdown("")  # Spacer
+    
+    if st.button("🔎 Search", use_container_width=True) and search_query:
+        try:
+            results = catalogue_explorer.search_tables(search_query)
+            
+            if results:
+                st.success(f"🔍 Found {len(results)} matching results")
                 
-                if results:
-                    st.success(f"🔍 Found {len(results)} matching tables")
+                for result in results:
+                    table_info = result["table_info"]
+                    table_name = table_info["name"]
+                    match_type = result["match_type"]
                     
-                    for result in results:
-                        table_info = result["table_info"]
-                        table_name = table_info["name"]
-                        match_type = result["match_type"]
+                    with st.expander(f"📄 {table_name} ({match_type.upper()})"):
+                        # Search result details
+                        col1, col2 = st.columns(2)
                         
-                        with st.expander(f"📄 {table_name} ({match_type.upper()})"):
-                            # Table metrics
-                            col1, col2, col3 = st.columns(3)
-                            
-                            with col1:
-                                st.metric("Layer", table_info.get("layer", "unknown"))
-                            
-                            with col2:
-                                st.metric("Rows", table_info.get("row_count", 0))
-                            
-                            with col3:
-                                st.metric("Columns", len(table_info.get("columns", [])))
-                            
-                            # Match details
+                        with col1:
+                            st.markdown("**📊 Table Info:**")
+                            st.write(f"• **Layer**: {table_info.get('layer', 'unknown')}")
+                            st.write(f"• **Rows**: {table_info.get('row_count', 0)}")
+                            st.write(f"• **Columns**: {len(table_info.get('columns', []))}")
+                        
+                        with col2:
                             if match_type == "column":
-                                st.write("**🎯 Matching Columns:**")
+                                st.markdown("**🎯 Matching Columns:**")
                                 matching_cols = result.get('matching_columns', [])
                                 for col in matching_cols:
                                     st.write(f"• {col}")
                             
-                            # Full table info
-                            with st.expander("📋 Full Details"):
-                                st.json(table_info)
-                else:
-                    st.info("🔍 No tables found matching your query. Try different search terms.")
-                    
-            except Exception as e:
-                st.error(f"❌ Search failed: {str(e)}")
+                            st.markdown("**📋 Full Details:**")
+                            st.json(table_info)
+            else:
+                st.info("🔍 No results found. Try different search terms.")
+                
+        except Exception as e:
+            st.error(f"❌ Search failed: {str(e)}")
 
     
 # ============================================================================
