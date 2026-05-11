@@ -86,9 +86,13 @@ class ChatService:
         
         style_config = style_instructions.get(style, style_instructions["Standard Answer"])
         
+        # Build project-specific system prompt
         system_prompt = (
             f"{style_config['system']}\n\n"
-            "Available Context:\n"
+            "CRITICAL: Answer ONLY about this specific data pipeline project.\n"
+            "Available information includes: project code, dataset schemas, transformations, pipeline stages.\n"
+            "If the project context doesn't cover something, respond: 'This is not available in your project documentation.'\n\n"
+            "Project Context from your files:\n"
             f"{context}"
         )
         
@@ -163,6 +167,16 @@ class ChatService:
         
         # Generate answer with style-specific temperature
         answer = self._generate(user_prompt, system_prompt, temperature)
+        
+        # Debug: Check if context was actually used
+        if "I don't have" in answer or "generic" in answer.lower():
+            # Force use of context by trying again with lower temperature
+            context_text = "\n\n".join([c.content for c in citations])
+            answer = self._generate(
+                f"Using this context: {context_text}\n\nQuestion: {clean_question}\n\nAnswer based only on this context:",
+                system_prompt,
+                0.1
+            )
         
         action_result = None
         if run_quality_check:

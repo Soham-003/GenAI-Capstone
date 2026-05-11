@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import uuid
 from pathlib import Path
 
 import chromadb
@@ -10,122 +11,172 @@ from app.config import settings
 from app.rag.retriever import COLLECTION_NAME
 
 
-def fixed_chunk(text: str, chunk_size: int = 600, overlap: int = 120) -> list[str]:
-    chunks: list[str] = []
-    start = 0
-    while start < len(text):
-        end = start + chunk_size
-        chunks.append(text[start:end].strip())
-        start += chunk_size - overlap
-    return [c for c in chunks if c]
-
-
-def semantic_like_chunk(text: str, max_sentences: int = 4) -> list[str]:
-    sentences = [s.strip() for s in text.replace("\n", " ").split(".") if s.strip()]
-    chunks: list[str] = []
+def semantic_chunk(text: str, max_sentences: int = 3) -> list[str]:
+    """
+    Chunk text by grouping related sentences. Better than fixed-size chunking.
+    """
+    if not text or not text.strip():
+        return []
+    
+    # Split into sentences while preserving structure
+    sentences = []
+    current_sent = ""
+    
+    for char in text:
+        current_sent += char
+        if char in '.!?':
+            stripped = current_sent.strip()
+            if stripped:
+                sentences.append(stripped)
+            current_sent = ""
+    
+    if current_sent.strip():
+        sentences.append(current_sent.strip())
+    
+    if not sentences:
+        return [text] if text.strip() else []
+    
+    # Group sentences semantically
+    chunks = []
     for i in range(0, len(sentences), max_sentences):
-        block = ". ".join(sentences[i : i + max_sentences]).strip()
-        if block:
-            chunks.append(block + ".")
+        chunk = " ".join(sentences[i:i + max_sentences]).strip()
+        if chunk:
+            chunks.append(chunk)
+    
     return chunks
 
 
-def hierarchical_chunk(text: str) -> list[str]:
-    sections = [s.strip() for s in text.split("##") if s.strip()]
-    if not sections:
-        return [text]
-    return [f"## {section}" for section in sections]
-
-
 def process_csv_file(csv_path: Path) -> list[str]:
-    """Process CSV file and extract meaningful content"""
+    """Extract meaningful information from CSV files for Q&A system."""
     import pandas as pd
     
     try:
         df = pd.read_csv(csv_path)
-        content_chunks = []
+        chunks = []
         
-        # Add file metadata
-        content_chunks.append(f"File: {csv_path.name}")
-        content_chunks.append(f"Layer: {csv_path.parent.name}")
-        content_chunks.append(f"Shape: {df.shape[0]} rows, {df.shape[1]} columns")
-        content_chunks.append(f"Columns: {', '.join(df.columns.tolist())}")
+        file_name = csv_path.stem
+        layer_name = csv_path.parent.name
         
-        # Add sample data
+        # Metadata chunk
+        metadata_text = f"""Dataset: {file_name}
+Layer: {layer_name}
+Rows: {df.shape[0]}, Columns: {df.shape[1]}
+Schema: {', '.join(df.columns.tolist())}"""
+        chunks.append(metadata_text)
+        
+        # Layer purpose
+        layer_descriptions = {
+            "bronze": "Raw data layer with unprocessed source data. May contain quality issues and missing values.",
+            "silver": "Cleaned data layer. Data is validated, enriched and standardized for analytics.",
+            "gold": "Business intelligence layer. Contains aggregated metrics and KPIs ready for reporting."
+        }
+        
+        purpose = layer_descriptions.get(layer_name, "Data layer")
+        chunks.append(f"Purpose: {purpose}")
+        
+        # Table content description
+        if "customer" in file_name.lower():
+            chunks.append("Contains customer demographic information including contact details and segments.")
+        elif "transaction" in file_name.lower():
+            chunks.append("Contains transaction records including amounts, timestamps and payment status.")
+        elif "product" in file_name.lower():
+            chunks.append("Contains product catalog with names, categories, pricing and stock information.")
+        
+        # Sample data
         if len(df) > 0:
-            content_chunks.append("Sample data:")
-            for i, row in df.head(5).iterrows():
-                row_data = ", ".join([f"{col}: {val}" for col, val in row.items()])
-                content_chunks.append(f"Row {i+1}: {row_data}")
+            sample_chunk = "Sample records:\n"
+            for idx, row in df.head(2).iterrows():
+                sample_chunk += "\n" + "; ".join([f"{col}={val}" for col, val in row.items()])
+            chunks.append(sample_chunk)
         
-        # Add data insights
-        content_chunks.append("Data insights:")
+        # Quality metrics
+        quality_chunk = "Data quality:\n"
         for col in df.columns:
+            null_pct = (df[col].isnull().sum() / len(df)) * 100 if len(df) > 0 else 0
             if df[col].dtype == 'object':
-                unique_vals = df[col].nunique()
-                content_chunks.append(f"{col}: {unique_vals} unique values")
+                unique = df[col].nunique()
+                quality_chunk += f"\n{col}: {unique} unique values, {null_pct:.1f}% missing"
             else:
-                content_chunks.append(f"{col}: min={df[col].min()}, max={df[col].max()}, mean={df[col].mean():.2f}")
+                try:
+                    quality_chunk += f"\n{col}: {df[col].min()} to {df[col].max()}, {null_pct:.1f}% missing"
+                except:
+                    quality_chunk += f"\n{col}: {null_pct:.1f}% missing"
+        chunks.append(quality_chunk)
         
-        return content_chunks
+        return chunks
         
     except Exception as e:
-        return [f"Error processing {csv_path}: {str(e)}"]
+        return [f"Dataset {csv_path.name}: {str(e)}"]
 
 
 def process_python_file(py_path: Path) -> list[str]:
-    """Process Python file and extract code documentation"""
+    """Extract functions, classes and logic from Python source files."""
     try:
         content = py_path.read_text(encoding="utf-8")
-        content_chunks = []
+        chunks = []
         
-        # Add file info
-        content_chunks.append(f"File: {py_path.relative_to(py_path.parent.parent)}")
-        content_chunks.append(f"Type: Python code")
+        file_name = py_path.name
+        try:
+            relative_path = py_path.relative_to(Path("app"))
+        except:
+            relative_path = py_path
         
-        # Extract docstrings and comments
+        chunks.append(f"Module: {relative_path}")
+        
         lines = content.split('\n')
-        in_docstring = False
-        docstring_content = []
+        i = 0
         
-        for i, line in enumerate(lines):
-            stripped = line.strip()
+        while i < len(lines):
+            line = lines[i].strip()
             
-            # Handle docstrings
-            if '"""' in stripped or "'''" in stripped:
-                if not in_docstring:
-                    in_docstring = True
-                    docstring_content.append(stripped)
-                else:
-                    in_docstring = False
-                    if docstring_content:
-                        content_chunks.append(f"Documentation:\n" + "\n".join(docstring_content))
-                        docstring_content = []
-                continue
+            # Class definitions
+            if line.startswith('class '):
+                class_def = line
+                docstring = ""
+                if i + 1 < len(lines) and '"""' in lines[i + 1]:
+                    j = i + 1
+                    doc_lines = []
+                    while j < len(lines):
+                        doc_lines.append(lines[j])
+                        if '"""' in lines[j] and j > i + 1:
+                            break
+                        j += 1
+                    docstring = "\n".join(doc_lines)
+                
+                chunk_text = f"Class: {class_def}\n{docstring}"
+                chunks.append(chunk_text)
             
-            if in_docstring:
-                docstring_content.append(stripped)
-                continue
+            # Function definitions
+            elif line.startswith('def '):
+                func_def = line
+                docstring = ""
+                if i + 1 < len(lines) and '"""' in lines[i + 1]:
+                    j = i + 1
+                    doc_lines = []
+                    while j < len(lines):
+                        doc_lines.append(lines[j])
+                        if '"""' in lines[j] and j > i + 1:
+                            break
+                        j += 1
+                    docstring = "\n".join(doc_lines)
+                
+                chunk_text = f"Function: {func_def}\nDoc: {docstring}"
+                chunks.append(chunk_text)
             
-            # Extract comments and function/class definitions
-            if stripped.startswith('#'):
-                content_chunks.append(f"Comment: {stripped[1:].strip()}")
-            elif stripped.startswith('def ') or stripped.startswith('class '):
-                content_chunks.append(f"Code: {stripped}")
+            # Comments
+            elif line.startswith('#') and not line.startswith('###'):
+                chunks.append(f"Note: {line[1:].strip()}")
+            
+            i += 1
         
-        return content_chunks
+        return chunks if chunks else [f"Module: {file_name}"]
         
     except Exception as e:
-        return [f"Error processing {py_path}: {str(e)}"]
+        return []
 
 
 def build_index(docs_path: str | None = None, persist_path: str | None = None) -> int:
-    # Process documentation files
-    docs_dir = Path(docs_path or settings.docs_path)
-    if not docs_dir.exists():
-        # If data/docs doesn't exist, use root for MD files
-        docs_dir = Path(".")
-
+    """Build knowledge base from docs, datasets and code using semantic chunking."""
     client = chromadb.PersistentClient(path=persist_path or settings.chroma_path)
     collection = client.get_or_create_collection(name=COLLECTION_NAME)
     model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
@@ -135,45 +186,81 @@ def build_index(docs_path: str | None = None, persist_path: str | None = None) -
     metas_to_add: list[dict] = []
     count = 0
 
-    # Process markdown documentation files
+    # Index markdown documentation with semantic chunking
+    print("Indexing documentation...")
     docs_root = Path(".")
+    skip_patterns = [".venv", "__pycache__", ".pytest_cache", "node_modules", ".git", ".egg-info"]
+    
     for path in docs_root.rglob("*.md"):
-        if ".venv" in str(path) or "__pycache__" in str(path):
+        if any(skip in str(path) for skip in skip_patterns):
             continue
-        raw_text = path.read_text(encoding="utf-8")
-        chunks = fixed_chunk(raw_text) + semantic_like_chunk(raw_text) + hierarchical_chunk(raw_text)
-        for i, chunk in enumerate(chunks):
-            chunk_id = hashlib.sha256(f"doc_{path}:{i}:{chunk}".encode("utf-8")).hexdigest()[:16]
-            docs_to_add.append(chunk)
-            ids_to_add.append(chunk_id)
-            metas_to_add.append({"source": str(path.relative_to(docs_root)), "type": "documentation"})
-            count += 1
+        try:
+            raw_text = path.read_text(encoding="utf-8")
+            chunks = semantic_chunk(raw_text)
+            
+            for chunk in chunks:
+                if chunk.strip():
+                    chunk_id = str(uuid.uuid4())
+                    docs_to_add.append(chunk)
+                    ids_to_add.append(chunk_id)
+                    metas_to_add.append({
+                        "source": str(path.relative_to(docs_root)),
+                        "type": "documentation"
+                    })
+                    count += 1
+        except:
+            pass
 
-    # Process CSV dataset files
+    # Index CSV datasets
+    print("Indexing datasets...")
     dataset_dir = Path("docs")
-    for path in dataset_dir.rglob("*.csv"):
-        content_chunks = process_csv_file(path)
-        for i, chunk in enumerate(content_chunks):
-            chunk_id = hashlib.sha256(f"csv_{path}:{i}:{chunk}".encode("utf-8")).hexdigest()[:16]
-            docs_to_add.append(chunk)
-            ids_to_add.append(chunk_id)
-            metas_to_add.append({"source": str(path.relative_to(dataset_dir)), "type": "dataset"})
-            count += 1
+    if dataset_dir.exists():
+        for path in dataset_dir.rglob("*.csv"):
+            try:
+                content_chunks = process_csv_file(path)
+                for chunk in content_chunks:
+                    if chunk.strip():
+                        chunk_id = str(uuid.uuid4())
+                        docs_to_add.append(chunk)
+                        ids_to_add.append(chunk_id)
+                        metas_to_add.append({
+                            "source": str(path.relative_to(dataset_dir)),
+                            "type": "dataset"
+                        })
+                        count += 1
+            except:
+                pass
 
-    # Process Python code files
+    # Index Python source code
+    print("Indexing source code...")
     app_dir = Path("app")
-    for path in app_dir.rglob("*.py"):
-        content_chunks = process_python_file(path)
-        for i, chunk in enumerate(content_chunks):
-            chunk_id = hashlib.sha256(f"code_{path}:{i}:{chunk}".encode("utf-8")).hexdigest()[:16]
-            docs_to_add.append(chunk)
-            ids_to_add.append(chunk_id)
-            metas_to_add.append({"source": str(path.relative_to(app_dir)), "type": "code"})
-            count += 1
+    if app_dir.exists():
+        for path in app_dir.rglob("*.py"):
+            try:
+                content_chunks = process_python_file(path)
+                for chunk in content_chunks:
+                    if chunk.strip():
+                        chunk_id = str(uuid.uuid4())
+                        docs_to_add.append(chunk)
+                        ids_to_add.append(chunk_id)
+                        metas_to_add.append({
+                            "source": str(path.relative_to(app_dir)),
+                            "type": "code"
+                        })
+                        count += 1
+            except:
+                pass
 
+    # Embed and store
     if docs_to_add:
-        embeddings = model.encode(docs_to_add).tolist()
-        collection.upsert(ids=ids_to_add, documents=docs_to_add, metadatas=metas_to_add, embeddings=embeddings)
+        print(f"Embedding {len(docs_to_add)} chunks...")
+        embeddings = model.encode(docs_to_add, show_progress_bar=False).tolist()
+        collection.upsert(
+            ids=ids_to_add,
+            documents=docs_to_add,
+            metadatas=metas_to_add,
+            embeddings=embeddings
+        )
 
     return count
 

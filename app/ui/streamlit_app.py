@@ -258,7 +258,7 @@ with tab1:
         with st.spinner("Thinking..."):
             try:
                 response = chat_service.chat(prompt, run_quality_check)
-                assistant_message = response.answer
+                assistant_message = response.answer if hasattr(response, 'answer') else str(response)
 
                 # Add style based on mode
                 if response_mode == "Detailed Explanation":
@@ -297,6 +297,20 @@ with tab2:
                     result = pipeline_service.execute_pipeline(layer)
                     st.success(f"✅ Pipeline executed successfully in {result['execution_time']:.2f}s")
                     st.json(result)
+                    
+                    # Show transformation details
+                    if layer == "full":
+                        st.info("🔄 **Automatic Transformation**: Bronze → Silver → Gold")
+                        st.write("The pipeline automatically:")
+                        st.write("1. ✅ Processed raw bronze data")
+                        st.write("2. ✅ Transformed to silver layer with cleaning and enrichment")
+                        st.write("3. ✅ Aggregated to gold layer with business insights")
+                    elif layer == "bronze-to-silver":
+                        st.info("🔄 **Transformation**: Bronze → Silver")
+                        st.write("The pipeline processed raw bronze data and created cleaned, enriched silver data.")
+                    elif layer == "silver-to-gold":
+                        st.info("🔄 **Transformation**: Silver → Gold")
+                        st.write("The pipeline aggregated silver data into business insights and KPIs.")
                 except Exception as e:
                     st.error(f"❌ Pipeline execution failed: {str(e)}")
 
@@ -333,102 +347,120 @@ with tab3:
     col1, col2 = st.columns([1, 2])
 
     with col1:
-        st.subheader("Catalogue Operations")
+        st.subheader("📋 Catalogue Operations")
 
-        if st.button("🔍 Scan Data Layers", type="primary"):
-            with st.spinner("Scanning data layers..."):
-                try:
-                    result = catalogue_explorer.scan_data_layers()
-                    st.success(f"✅ Catalogue updated! Found {result['tables_found']} tables")
-                    st.json(result)
-                except Exception as e:
-                    st.error(f"❌ Scan failed: {str(e)}")
+        # Scan section with better styling
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            if st.button("🔍 Scan Data Layers", type="primary", use_container_width=True):
+                with st.spinner("Scanning data layers..."):
+                    try:
+                        result = catalogue_explorer.scan_data_layers()
+                        st.success(f"✅ Catalogue updated! Found {result['tables_found']} tables")
+                        st.json(result)
+                    except Exception as e:
+                        st.error(f"❌ Scan failed: {str(e)}")
+        
+        with col2:
+            st.write("")  # Spacer for alignment
 
-        if st.button("📋 List All Tables"):
+        # List tables section
+        st.subheader("📊 Table Inventory")
+        
+        if st.button("📋 List All Tables", use_container_width=True):
             try:
                 tables = catalogue_explorer.catalogue["tables"]
-                st.success(f"📊 Found {len(tables)} tables")
-
-                # Display as a nice table
+                
                 if tables:
-                    table_data = []
-                    for table_name, table_info in tables.items():
-                        table_data.append({
-                            "Table Name": table_name,
-                            "Layer": table_info.get("layer", "unknown"),
-                            "Row Count": table_info.get("row_count", "unknown"),
-                            "Columns": len(table_info.get("columns", []))
-                        })
-
-                    st.dataframe(pd.DataFrame(table_data))
+                    # Create better styled table display
+                    st.success(f"📊 Found {len(tables)} tables across all layers")
+                    
+                    # Display with better formatting
+                    for layer in ["bronze", "silver", "gold"]:
+                        layer_tables = {name: info for name, info in tables.items() 
+                                      if info.get("layer", "").lower() == layer}
+                        
+                        if layer_tables:
+                            st.write(f"### 🗂 {layer.title()} Layer ({len(layer_tables)} tables)")
+                            
+                            for table_name, table_info in layer_tables.items():
+                                with st.expander(f"📄 {table_name}"):
+                                    col_a, col_b, col_c = st.columns(3)
+                                    
+                                    with col_a:
+                                        st.metric("Rows", table_info.get("row_count", 0))
+                                    
+                                    with col_b:
+                                        st.metric("Columns", len(table_info.get("columns", [])))
+                                    
+                                    with col_c:
+                                        has_pii = bool(table_info.get("pii_columns", []))
+                                        st.metric("PII", "🔒 Yes" if has_pii else "✅ No")
+                                    
+                                    # Show schema
+                                    if table_info.get("columns"):
+                                        st.write("**Schema:**")
+                                        st.code(", ".join(table_info["columns"]))
                 else:
-                    st.info("No tables found. Run a scan first.")
+                    st.info("📋 No tables found. Run a scan first to discover your data layers.")
 
             except Exception as e:
                 st.error(f"❌ Failed to list tables: {str(e)}")
 
-        # Search functionality
-        st.subheader("🔎 Search Tables")
-        search_query = st.text_input("Search query", placeholder="Enter table name or column...")
-
-        if st.button("Search") and search_query:
+        # Search section with better UI
+        st.subheader("� Search Tables")
+        
+        col_search, col_button = st.columns([3, 1])
+        
+        with col_search:
+            search_query = st.text_input("Search tables or columns...", placeholder="Enter table name or column...")
+        
+        with col_button:
+            st.write("")  # Spacer
+        
+        if st.button("🔎 Search", use_container_width=True) and search_query:
             try:
                 results = catalogue_explorer.search_tables(search_query)
+                
                 if results:
-                    st.success(f"Found {len(results)} matching tables")
+                    st.success(f"🔍 Found {len(results)} matching tables")
+                    
                     for result in results:
                         table_info = result["table_info"]
                         table_name = table_info["name"]
                         match_type = result["match_type"]
-                        with st.expander(f"📄 {table_name} ({match_type})"):
+                        
+                        with st.expander(f"📄 {table_name} ({match_type.upper()})"):
+                            # Table metrics
+                            col1, col2, col3 = st.columns(3)
+                            
+                            with col1:
+                                st.metric("Layer", table_info.get("layer", "unknown"))
+                            
+                            with col2:
+                                st.metric("Rows", table_info.get("row_count", 0))
+                            
+                            with col3:
+                                st.metric("Columns", len(table_info.get("columns", [])))
+                            
+                            # Match details
                             if match_type == "column":
-                                st.write(f"**Matching columns:** {', '.join(result.get('matching_columns', []))}")
-                            st.json(table_info)
+                                st.write("**🎯 Matching Columns:**")
+                                matching_cols = result.get('matching_columns', [])
+                                for col in matching_cols:
+                                    st.write(f"• {col}")
+                            
+                            # Full table info
+                            with st.expander("📋 Full Details"):
+                                st.json(table_info)
                 else:
-                    st.info("No tables found matching your query.")
+                    st.info("🔍 No tables found matching your query. Try different search terms.")
+                    
             except Exception as e:
                 st.error(f"❌ Search failed: {str(e)}")
 
-    with col2:
-        st.subheader("Catalogue Summary")
-
-        try:
-            tables = catalogue_explorer.catalogue.get("tables", {})
-            total_tables = len(tables)
-
-            # Count by layer
-            layer_counts = {}
-            pii_tables = 0
-
-            for table_info in tables.values():
-                layer = table_info.get("layer", "unknown")
-                layer_counts[layer] = layer_counts.get(layer, 0) + 1
-
-                # Check for PII
-                if any(col.get("is_pii", False) for col in table_info.get("columns", [])):
-                    pii_tables += 1
-
-            # Display metrics
-            col_a, col_b, col_c = st.columns(3)
-
-            with col_a:
-                st.metric("Total Tables", total_tables)
-
-            with col_b:
-                st.metric("PII Tables", pii_tables)
-
-            with col_c:
-                st.metric("Layers", len(layer_counts))
-
-            # Layer breakdown
-            if layer_counts:
-                st.subheader("Tables by Layer")
-                for layer, count in layer_counts.items():
-                    st.metric(f"{layer.title()} Layer", count)
-
-        except Exception as e:
-            st.error(f"❌ Failed to load catalogue summary: {str(e)}")
-
+    
 # ============================================================================
 # TAB 4: QUALITY CHECKS
 # ============================================================================
@@ -518,25 +550,29 @@ with tab5:
 
     # Get metrics status
     try:
-        metrics = get_metrics_status()
-
+        from app.observability.metrics import get_metrics_status
+        
         # Pipeline Health
         st.subheader("🚀 Pipeline Health")
-
-        # Mock some dashboard data (in a real app, this would come from Prometheus)
+        
+        # Get real metrics
         col1, col2, col3, col4 = st.columns(4)
-
+        
         with col1:
-            st.metric("Executions", metrics.get("request_count", 0))
-
+            metrics = get_metrics_status()
+            st.metric("Total Requests", metrics.get("request_count", 0))
+        
         with col2:
-            st.metric("Health Status", "Healthy" if metrics.get("metrics_server_initialized") else "Unknown")
-
+            metrics = get_metrics_status()
+            health_status = "🟢 Healthy" if metrics.get("metrics_server_initialized") else "🟡 Unknown"
+            st.metric("System Health", health_status)
+        
         with col3:
             st.metric("Active Tables", len(catalogue_explorer.catalogue.get("tables", {})))
-
+        
         with col4:
-            st.metric("Quality Score", "95%")  # Mock value
+            metrics = get_metrics_status()
+            st.metric("Quality Actions", metrics.get("quality_action_count", 0))
 
         # Recent Activity
         st.subheader("📈 Recent Activity")

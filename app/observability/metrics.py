@@ -43,12 +43,28 @@ def start_metrics_server() -> None:
             raise
 
 
-def get_metrics_status() -> dict[str, bool]:
+def get_metrics_status() -> dict[str, any]:
     """Check if metrics server is running and metrics are being exported."""
+    try:
+        request_count = REQUEST_COUNT._value.get() if hasattr(REQUEST_COUNT, '_value') else 0
+    except:
+        request_count = 0
+    
+    try:
+        quality_count = QUALITY_ACTION_COUNT._value.get() if hasattr(QUALITY_ACTION_COUNT, '_value') else 0
+    except:
+        quality_count = 0
+    
+    try:
+        pipeline_count = PIPELINE_EXECUTIONS._value.get() if hasattr(PIPELINE_EXECUTIONS, '_value') else 0
+    except:
+        pipeline_count = 0
+    
     return {
         "metrics_server_initialized": _started,
-        "request_count": float(REQUEST_COUNT._value.get()),
-        "quality_checks_count": float(QUALITY_ACTION_COUNT._value.get()),
+        "request_count": float(request_count),
+        "quality_action_count": float(quality_count),
+        "pipeline_executions": float(pipeline_count),
     }
 
 
@@ -112,7 +128,7 @@ class PipelineMetrics:
         """Get timestamp of last execution"""
         if self._execution_history:
             return self._execution_history[-1]["timestamp"]
-        return None
+        return "No executions yet"
         
     def get_total_executions(self) -> int:
         """Get total number of executions"""
@@ -123,7 +139,7 @@ class PipelineMetrics:
         total_executions = len(self._execution_history)
         total_failures = len(self._failure_history)
         if total_executions == 0:
-            return 0.0
+            return 100.0  # Assume healthy if no executions yet
         return ((total_executions - total_failures) / total_executions) * 100
         
     def get_avg_execution_time(self) -> float:
@@ -132,10 +148,14 @@ class PipelineMetrics:
             return 0.0
         return sum(exec["duration"] for exec in self._execution_history) / len(self._execution_history)
         
-    def get_recent_failures(self, hours: int = 24) -> List[Dict]:
-        """Get failures from the last N hours"""
+    def get_recent_failures(self, hours: int = 24) -> int:
+        """Get number of failures from the last N hours"""
         cutoff_time = datetime.now() - timedelta(hours=hours)
-        return [
-            failure for failure in self._failure_history
-            if datetime.fromisoformat(failure["timestamp"]) > cutoff_time
-        ]
+        recent_failures = []
+        for failure in self._failure_history:
+            try:
+                if datetime.fromisoformat(failure["timestamp"]) > cutoff_time:
+                    recent_failures.append(failure)
+            except:
+                continue
+        return len(recent_failures)

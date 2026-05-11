@@ -244,7 +244,7 @@
         "signup_year": 0
       },
       "file_size": 573,
-      "last_modified": "2026-05-10T19:30:02.090485",
+      "last_modified": "2026-05-11T12:14:02.535860",
       "sample_data": [
         {
           "customer_id": 1,
@@ -318,7 +318,7 @@
         "months_since_launch": 0
       },
       "file_size": 719,
-      "last_modified": "2026-05-10T19:30:02.091937",
+      "last_modified": "2026-05-11T12:14:02.537191",
       "sample_data": [
         {
           "product_id": "P001",
@@ -398,7 +398,7 @@
         "is_weekend": 0
       },
       "file_size": 1140,
-      "last_modified": "2026-05-10T19:30:02.091294",
+      "last_modified": "2026-05-11T12:14:02.536715",
       "sample_data": [
         {
           "transaction_id": 1001,
@@ -469,7 +469,7 @@
         "revenue_share": 0
       },
       "file_size": 258,
-      "last_modified": "2026-05-10T19:30:02.115521",
+      "last_modified": "2026-05-11T12:14:02.563509",
       "sample_data": [
         {
           "product_category": "Books",
@@ -534,7 +534,7 @@
         "top_category": 0
       },
       "file_size": 156,
-      "last_modified": "2026-05-10T19:30:02.115030",
+      "last_modified": "2026-05-11T12:14:02.562993",
       "sample_data": [
         {
           "month": 11,
@@ -582,7 +582,7 @@
         "revenue_per_customer": 0
       },
       "file_size": 313,
-      "last_modified": "2026-05-10T19:30:02.114652",
+      "last_modified": "2026-05-11T12:14:02.562627",
       "sample_data": [
         {
           "segment": "Experienced_Professionals",
@@ -753,5 +753,5 @@
       "overall_score": 100.0
     }
   },
-  "last_updated": "2026-05-10T19:42:10.944738"
+  "last_updated": "2026-05-11T12:14:15.685354"
 }
